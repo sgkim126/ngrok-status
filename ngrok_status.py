@@ -32,10 +32,17 @@ def main(target, secret, interval):
             time.sleep(interval)
 
 
+def read_file(file_name):
+    """ read contents of file """
+    with open(file_name, 'r') as file:
+        return file.read()
+
+
 if __name__ == '__main__':
     PARSER = argparse.ArgumentParser()
     PARSER.add_argument('target')
-    PARSER.add_argument('secret')
+    PARSER.add_argument('secret_file', metavar='secret-file')
     PARSER.add_argument('interval', type=int)
     ARGS = PARSER.parse_args()
-    main(ARGS.target, ARGS.secret, ARGS.interval)
+    SECRET = read_file(ARGS.secret_file)
+    main(ARGS.target, SECRET, ARGS.interval)

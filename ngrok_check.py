@@ -5,6 +5,7 @@ import argparse
 import base64
 import http.server
 import hashlib
+import ngrok_status
 
 
 def main(secret, port):
@@ -43,7 +44,8 @@ def main(secret, port):
 
 if __name__ == '__main__':
     PARSER = argparse.ArgumentParser()
-    PARSER.add_argument('secret')
+    PARSER.add_argument('secret_file', metavar='secret-file')
     PARSER.add_argument('port', type=int)
     ARGS = PARSER.parse_args()
-    main(ARGS.secret, ARGS.port)
+    SECRET = ngrok_status.read_file(ARGS.secret_file)
+    main(SECRET, ARGS.port)
