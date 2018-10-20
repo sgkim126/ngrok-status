@@ -4,7 +4,6 @@
 import argparse
 import base64
 import http.server
-import hashlib
 import ngrok_status
 
 
@@ -22,16 +21,14 @@ def main(secret, port):
             self.wfile.write(b'')
 
             data = base64.b64decode(self.headers.get('Authorization')[len('Basic '):])
-            address = data[0:len(data) - 33]
+            address = data[:data.rfind(b':')]
             if address == self.last_address:
                 return
 
-            hmac = data[len(data) - 32:].decode('utf-8')
+            received_hmac = data[data.rfind(b':') + 1:].decode('utf-8')
+            calculated_hmac = ngrok_status.hmac(address, bytes(secret, 'utf-8'))
 
-            blake = hashlib.blake2b(digest_size=16) # pylint: disable=E1123
-            blake.update(address)
-            blake.update(bytes(secret, 'utf-8'))
-            if hmac != blake.hexdigest():
+            if received_hmac != calculated_hmac:
                 return
 
             self.last_address = address

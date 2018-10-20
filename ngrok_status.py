@@ -2,8 +2,9 @@
 """ check status """
 
 import argparse
-import time
+import binascii
 import hashlib
+import time
 import json
 import requests
 
@@ -24,12 +25,14 @@ def main(target, secret, interval):
                 continue
             last_address = address
             print(last_address)
-            blake = hashlib.blake2b(digest_size=16) # pylint: disable=E1123
-            blake.update(bytes(last_address, 'utf-8'))
-            blake.update(bytes(secret, 'utf-8'))
-            requests.post(target, auth=(last_address, blake.hexdigest()))
+            calculated_hmac = hmac(bytes(last_address, 'utf-8'), bytes(secret, 'utf-8'))
+            requests.post(target, auth=(last_address, calculated_hmac))
         finally:
             time.sleep(interval)
+
+
+def hmac(address, secret):
+    return binascii.hexlify(hashlib.pbkdf2_hmac('sha256', address, secret, 8)).decode('utf-8')
 
 
 def read_file(file_name):
