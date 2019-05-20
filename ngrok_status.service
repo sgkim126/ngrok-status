@@ -1,0 +1,14 @@
+[Unit]
+Description=ngrok_status
+After=network.target
+
+[Service]
+ExecStart=/opt/ngrok-status/ngrok_status.py {url} /opt/ngrok-status/secret 3
+# ExecReload=/bin/kill -HUP $MAINPID
+# KillMode=process
+# Restart=on-failure
+Type=idle
+
+[Install]
+WantedBy=multi-user.target
+
